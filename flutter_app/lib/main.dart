@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 
+const socketURL = String.fromEnvironment('SERVER_URL',
+    defaultValue: 'ws://localhost:4000/socket/websocket');
+const channelName =
+    String.fromEnvironment('CHANNEL_NAME', defaultValue: 'chat:lobby');
+
 void main() {
   runApp(const SimpleChatApp());
 }
@@ -66,7 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
       // Connect to Phoenix socket
       // Use 10.0.2.2 for Android emulator, localhost for iOS simulator/web
       _socket = PhoenixSocket(
-        'ws://localhost:4000/socket/websocket',
+        socketURL,
         socketOptions: PhoenixSocketOptions(
           timeout: const Duration(seconds: 10),
         ),
@@ -101,7 +106,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void _joinChannel() async {
     if (_socket == null) return;
 
-    _channel = _socket!.addChannel(topic: 'chat:lobby');
+    _channel = _socket!.addChannel(topic: channelName);
 
     try {
       final response = await _channel!.join().future;
